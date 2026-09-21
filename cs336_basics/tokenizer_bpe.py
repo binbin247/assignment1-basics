@@ -28,7 +28,7 @@ def train_bpe(
         print("The chunk boundaries are: ", chunk_boundaries)
 
     # Construc counts: dict [word, count]
-    word_counts = {}
+    word_counts: dict[str, int] = {}
     with open(input_path, 'rb') as f:
         iter_pre_tokenization = pre_tokenization(f.read(chunk_boundaries[1]-chunk_boundaries[0]).decode('utf-8'))
         for match in iter_pre_tokenization:
@@ -36,14 +36,13 @@ def train_bpe(
             word_counts[token] = word_counts.get(token, 0) + 1
 
     # Construct bp_counts: dict [bp, count]
-    bp_counts = {}
+    bp_counts: dict[tuple[bytes, bytes], int] = {}
     for key, value in word_counts.items():
-        key.encode('utf-8')
-        for i in range(len(key)-1):
-            bp = key[i:i+2]
+        key_bytes = key.encode('utf-8')
+        for i in range(len(key_bytes)-1):
+            bp = (key_bytes[i], key_bytes[i+1])
             bp_counts[bp] = bp_counts.get(bp,0) + value
 
-    print("The bp_counts are: ", bp_counts['oe'])
 
     print("The vocab size is: ", len(vocab))
     return vocab, merges
